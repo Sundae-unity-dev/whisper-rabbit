@@ -5,12 +5,12 @@ import hashlib
 import logging
 import os
 import time
+from collections.abc import Iterable, Iterator
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Iterable, Iterator
 
 from .device import DeviceChoice
-from .formats import Format, Segment, WRITERS, write_json
+from .formats import WRITERS, Format, Segment, write_json
 
 log = logging.getLogger("whisper_rabbit.transcribe")
 

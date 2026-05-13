@@ -8,14 +8,19 @@ version = "0.1.0"
 description = "faster-whisper 기반 회의 녹음 받아쓰기 + Claude Code 슬래시 커맨드 통합"
 readme = "README.md"
 requires-python = ">=3.10"
-authors = [{ name = "kdt" }]
+license = { text = "MIT" }
+authors = [{ name = "elice", email = "kdt@elice.io" }]
 keywords = ["whisper", "faster-whisper", "transcription", "meeting", "claude-code"]
 classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Multimedia :: Sound/Audio :: Speech",
     "Operating System :: OS Independent",
-    "Private :: Do Not Upload",
+    "License :: OSI Approved :: MIT License",
 ]
 dependencies = [
     "faster-whisper>=1.2.0",

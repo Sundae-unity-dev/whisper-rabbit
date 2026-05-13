@@ -2,9 +2,10 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Iterable
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Iterable, Literal
+from typing import Literal
 
 Format = Literal["txt", "srt", "vtt", "json"]
 ALL_FORMATS: tuple[Format, ...] = ("txt", "srt", "vtt", "json")

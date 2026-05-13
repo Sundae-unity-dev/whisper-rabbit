@@ -14,7 +14,7 @@ import json
 import shutil
 import subprocess
 import sys
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from pathlib import Path
 
 from ._io_utils import force_utf8_stdio

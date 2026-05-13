@@ -134,7 +134,7 @@ def _tqdm_progress():
 
     class _Bar:
         def __init__(self) -> None:
-            self.bar: "tqdm | None" = None
+            self.bar: tqdm | None = None
 
         def update(self, current: float, total: float) -> None:
             if self.bar is None:

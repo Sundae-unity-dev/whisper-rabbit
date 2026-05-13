@@ -190,4 +190,6 @@ whisper-rabbit/
 
 ## 라이선스
 
-미정 (private).
+[MIT](./LICENSE) — Copyright © 2026 elice.
+
+기여 가이드는 [CONTRIBUTING.md](./CONTRIBUTING.md) 참고.

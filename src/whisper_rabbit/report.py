@@ -14,13 +14,14 @@ import argparse
 import json
 import logging
 import sys
+from collections.abc import Iterable
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any, Iterable, Literal
+from typing import Any, Literal
 
 from docx import Document
-from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_ALIGN_VERTICAL
+from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Cm, Inches, Pt, RGBColor
@@ -123,7 +124,7 @@ class MeetingData:
 
     # ─ 직렬화 ─
     @classmethod
-    def from_dict(cls, d: dict[str, Any]) -> "MeetingData":
+    def from_dict(cls, d: dict[str, Any]) -> MeetingData:
         return cls(
             team=d["team"],
             date=d["date"],

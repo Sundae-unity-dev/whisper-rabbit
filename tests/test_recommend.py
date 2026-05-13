@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import pytest
-
 from whisper_rabbit.recommend import (
     CPU_RTF,
     GPU_RTF,
