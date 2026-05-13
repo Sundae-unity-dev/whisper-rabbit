@@ -24,15 +24,27 @@
 
 ## 설치
 
-```powershell
-# 1) 의존성 + 패키지 editable 설치
-python -m pip install -e .
+권장 한 줄(설치 + 슬래시 커맨드 동기화 + small 모델 사전 다운로드까지 한 번에):
 
-# 2) Claude Code 슬래시 커맨드 동기화 (~/.claude/commands/회의녹음정리.md 로 복사)
+```powershell
 powershell -ExecutionPolicy Bypass -File scripts\install.ps1
 ```
 
-editable 설치를 쓰지 않으면 `python -m pip install -r requirements.txt` 만으로도 모듈 실행은 가능하다.
+`scripts\install.ps1` 가 다음 세 단계를 순서대로 수행한다.
+
+1. **패키지 editable 설치** — `python -m pip install -e .`
+2. **슬래시 커맨드 동기화** — `claude/commands/*.md` → `~/.claude/commands/`
+3. **모델 사전 다운로드** — `python -m whisper_rabbit.prefetch small` (1~5분, HuggingFace 캐시 채워둠). **이 단계 덕분에 첫 `/회의녹음정리` 호출이 모델 다운로드로 기다리는 일이 없다.**
+
+옵션:
+
+| 플래그 | 효과 |
+|---|---|
+| `-SkipPipInstall` | 1단계 건너뛰기 (이미 editable 설치된 경우) |
+| `-SkipPrefetch` | 3단계 건너뛰기 (오프라인 환경 또는 직접 모델 선택 원할 때) |
+| `-PrefetchModel medium` | 3단계 모델 변경 (`tiny`/`base`/`small`/`medium`/`large-v3` 등) |
+
+editable 설치만 쓰고 싶으면 그냥 `python -m pip install -e .` 도 가능하지만, 첫 호출 시 모델 다운로드(1~5분) 가 발생한다.
 
 ## 사용법
 
@@ -107,6 +119,31 @@ python -m whisper_rabbit "C:\path\to\meeting.m4a" --model small --formats txt,sr
 }
 ```
 
+## 트러블슈팅
+
+### 첫 실행이 모델 다운로드에서 멈춰 보일 때
+`install.ps1` 의 사전 다운로드 단계를 거치면 보통 만나지 않지만, 직접 `pip install -e .` 만 하고 처음 호출했다면 1~5분 동안 진행률 없이 보일 수 있다. 이는 huggingface_hub 가 진행률을 stderr 로 출력하기 때문이며, 백그라운드 실행 시 가려질 수 있다.
+
+5분 이상 진행이 없거나 `HuggingFace xet` 백엔드(LFS 후속)에서 hang 이 의심되면:
+
+1. 현재 프로세스 중단 (Ctrl+C 또는 `Stop-Process`)
+2. 캐시 정리:
+   ```powershell
+   Remove-Item -Recurse -Force "$env:USERPROFILE\.cache\huggingface\hub\models--Systran--faster-whisper-small"
+   ```
+3. 재시도. 이 도구는 모든 호출 직전에 `HF_HUB_DISABLE_XET=1` 을 자동 set 해 xet 우회 모드로 다운로드한다.
+
+### 모델만 미리 받아두고 싶을 때
+```powershell
+python -m whisper_rabbit.prefetch small      # 또는 medium / large-v3 등
+```
+
+### CUDA 가 잡히지 않을 때
+- `python -c "import ctranslate2; print(ctranslate2.get_cuda_device_count())"` 로 ctranslate2 가 CUDA 디바이스를 인식하는지 확인. 0 이면 CUDA-enabled ctranslate2 빌드 또는 cuDNN/CUDA 드라이버 누락. CPU 모드(`--device cpu`)로 우회 가능.
+
+### 산출물이 한글로 깨져 보일 때
+콘솔이 cp949 인 경우 출력 텍스트만 깨지고, 실제 파일은 UTF-8 로 정상 저장된다. PowerShell 에서 `Get-ChildItem` 으로 파일명 확인 권장.
+
 ## 개발
 
 ```powershell
@@ -125,7 +162,8 @@ whisper-rabbit/
 │   ├── cli.py             # argparse / 진입점
 │   ├── device.py          # CUDA 감지·compute_type 결정
 │   ├── formats.py         # txt/srt/vtt/json 출력
-│   └── transcribe.py      # WhisperModel + BatchedInferencePipeline 래핑
+│   ├── prefetch.py        # 모델 사전 다운로드 진입점
+│   └── transcribe.py      # WhisperModel + BatchedInferencePipeline 래핑 + xet 자동 우회
 ├── claude/commands/
 │   └── 회의녹음정리.md       # Claude Code 슬래시 커맨드 정의
 ├── scripts/

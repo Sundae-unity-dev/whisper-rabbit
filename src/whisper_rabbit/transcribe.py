@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import hashlib
 import logging
+import os
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -12,6 +13,43 @@ from .device import DeviceChoice
 from .formats import Format, Segment, WRITERS, write_json
 
 log = logging.getLogger("whisper_rabbit.transcribe")
+
+# 모델별 대략적 다운로드 크기 (사용자 안내용)
+MODEL_DOWNLOAD_SIZE = {
+    "tiny": "~75 MB",
+    "base": "~150 MB",
+    "small": "~500 MB",
+    "medium": "~1.5 GB",
+    "large-v1": "~3.0 GB",
+    "large-v2": "~3.0 GB",
+    "large-v3": "~3.0 GB",
+    "distil-large-v3": "~1.5 GB",
+}
+
+
+def _ensure_hf_env() -> None:
+    """HuggingFace 의 Windows 다운로드 hang 회피용 환경변수를 보장한다.
+
+    xet 백엔드(LFS 후속) 가 Windows 에서 첫 핸드셰이크 직후 멈추는 사례가
+    재현되므로 모델 로딩 직전에 무조건 우회 옵션을 켜둔다. 이미 사용자가
+    명시적으로 다른 값을 지정한 경우는 그대로 둔다 (setdefault).
+    """
+    os.environ.setdefault("HF_HUB_DISABLE_XET", "1")
+    os.environ.setdefault("HF_HUB_DISABLE_SYMLINKS_WARNING", "1")
+
+
+def _is_model_cached(model_size: str) -> bool:
+    """faster-whisper-<model_size> 가 HF 캐시에 이미 받아져 있는지 확인."""
+    try:
+        from huggingface_hub import scan_cache_dir
+        repo_id = f"Systran/faster-whisper-{model_size}"
+        info = scan_cache_dir()
+        for r in info.repos:
+            if r.repo_id == repo_id and r.size_on_disk > 1_000_000:  # 1MB 이상
+                return True
+    except Exception:
+        pass
+    return False
 
 
 @dataclass
@@ -70,6 +108,22 @@ def sha1_of_file(path: Path, chunk: int = 1 << 20) -> str:
 
 
 def _load_model(model_size: str, choice: DeviceChoice):
+    _ensure_hf_env()
+
+    if not _is_model_cached(model_size):
+        size = MODEL_DOWNLOAD_SIZE.get(model_size, "용량 미상")
+        log.warning(
+            "Whisper '%s' 모델이 캐시에 없어 HuggingFace 에서 다운로드를 시작합니다 "
+            "(%s, 네트워크 상태에 따라 1~5분 소요). 이후 호출부터는 캐시되어 즉시 시작됩니다.",
+            model_size, size,
+        )
+        log.warning(
+            "다운로드 진행률은 huggingface_hub 가 stderr 로 출력합니다. "
+            "5분 이상 멈춰 있다면 Ctrl+C 후 캐시 디렉토리를 정리하고 재시도하세요: "
+            "Remove-Item -Recurse -Force \"$env:USERPROFILE\\.cache\\huggingface\\hub\\models--Systran--faster-whisper-%s\"",
+            model_size,
+        )
+
     from faster_whisper import WhisperModel
     log.info("WhisperModel(%s, device=%s, compute_type=%s) 로딩",
              model_size, choice.device, choice.compute_type)
@@ -77,6 +131,19 @@ def _load_model(model_size: str, choice: DeviceChoice):
     model = WhisperModel(model_size, device=choice.device, compute_type=choice.compute_type)
     log.info("모델 로드 완료 (%.1fs)", time.time() - t0)
     return model
+
+
+def prefetch_model(model_size: str, choice: DeviceChoice | None = None) -> None:
+    """모델만 미리 받아두고 종료. install.ps1 등에서 호출.
+
+    transcribe 까지는 안 하므로 캐시만 채워두는 용도.
+    """
+    from .device import resolve
+    if choice is None:
+        choice = resolve("auto", "auto")
+    log.info("Whisper '%s' 모델 사전 다운로드", model_size)
+    _load_model(model_size, choice)
+    log.info("사전 다운로드 완료")
 
 
 def _iter_segments(raw_iter: Iterable) -> Iterator[Segment]:
