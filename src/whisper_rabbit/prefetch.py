@@ -9,12 +9,14 @@ from __future__ import annotations
 import argparse
 import sys
 
+from ._io_utils import force_utf8_stdio
 from .cli import MODEL_CHOICES, configure_logging
 from .device import resolve
 from .transcribe import prefetch_model
 
 
 def main(argv: list[str] | None = None) -> int:
+    force_utf8_stdio()
     p = argparse.ArgumentParser(
         prog="whisper_rabbit.prefetch",
         description="Whisper 모델 사전 다운로드 (캐시만 채우고 종료).",

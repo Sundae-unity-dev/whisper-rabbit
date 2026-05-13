@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 
 from . import __version__
+from ._io_utils import force_utf8_stdio
 from .device import resolve
 from .formats import ALL_FORMATS, Format
 from .transcribe import TranscribeOptions, run, write_outputs
@@ -76,6 +77,7 @@ def configure_logging(verbosity: int, quiet: bool) -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
+    force_utf8_stdio()
     args = build_parser().parse_args(argv)
     configure_logging(args.verbose, args.quiet)
     log = logging.getLogger("whisper_rabbit.cli")

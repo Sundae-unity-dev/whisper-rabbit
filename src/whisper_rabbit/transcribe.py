@@ -178,6 +178,8 @@ def run(
         except ImportError:
             log.info("BatchedInferencePipeline 미지원 — 일반 transcribe 사용")
 
+    log.info("받아쓰기 대상: %s | 모델=%s | device=%s/%s | batched=%s",
+             audio.name, options.model_size, choice.device, choice.compute_type, batched)
     log.info("받아쓰기 시작: %s", audio)
     t0 = time.time()
     kwargs = dict(

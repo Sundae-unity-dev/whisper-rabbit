@@ -25,6 +25,8 @@ from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Cm, Inches, Pt, RGBColor
 
+from ._io_utils import force_utf8_stdio
+
 log = logging.getLogger("whisper_rabbit.report")
 
 # ─────────────────────────────────────────────────────────────
@@ -644,6 +646,7 @@ def _default_output(data: MeetingData) -> Path:
 
 
 def main(argv: list[str] | None = None) -> int:
+    force_utf8_stdio()
     args = build_parser().parse_args(argv)
     logging.basicConfig(
         level=logging.DEBUG if args.verbose >= 2 else logging.INFO,
