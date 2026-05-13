@@ -1,8 +1,6 @@
 # whisper-rabbit
 
-> *"Oh dear! Oh dear! I shall be late!"* — Alice, *Alice's Adventures in Wonderland*
-
-흰 토끼처럼 회의를 따라잡는 받아쓰기 도구. faster-whisper 기반 STT + Claude Code 슬래시 커맨드 `/회의녹음정리` 를 묶어, 음성 파일을 받아 **논의 내용 / 문제점 / 해결방안** 3섹션 회의록 docx로 자동 정리한다.
+[elice](https://elice.io) 의 회의·스크럼을 자동으로 정리하기 위해 만든 사내용 도구. faster-whisper 기반 STT + Claude Code 슬래시 커맨드 `/회의녹음정리` 를 묶어, 음성 파일을 받아 **논의 내용 / 문제점 / 해결방안** 3섹션 회의록 docx로 자동 정리한다.
 
 ## 주요 기능
 
@@ -135,7 +133,10 @@ whisper-rabbit/
 
 ## 이름의 유래
 
-Alice 의 흰 토끼는 시계를 들고 늦지 않으려 달리는 존재. 회의 한 시간 분량 녹음을 RTF 0.3x 로 따라잡는 이 도구의 자세와 맞물려 있다. faster-**whisper** 의 모델 이름과도 자연스럽게 겹친다.
+- **whisper** — faster-**whisper** 모델명 그대로.
+- **rabbit** — 사명 **elice** 에 자연스럽게 따라붙는 동물 모티프. 약속 시간에 늦지 않으려 시계를 들고 달리는 토끼처럼, 회의 한 시간 분량 녹음을 RTF 0.3x 안팎으로 따라잡겠다는 도구의 자세에서 따왔다.
+
+사명과 발음을 거꾸로 끼워 맞추려고 만든 이름은 아니고, elice 사내 회의 회고를 자동화하면서 "엘리스 토끼" 라는 별명이 먼저 굳었다.
 
 ## 라이선스
 
