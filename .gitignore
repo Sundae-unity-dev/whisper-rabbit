@@ -33,7 +33,6 @@ Desktop.ini
 *.transcript.json
 *.transcript.srt
 *.transcript.vtt
-*.summary.md
 samples/
 out/
 *.wav
