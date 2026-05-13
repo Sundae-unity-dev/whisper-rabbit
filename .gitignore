@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+build/
+dist/
+.eggs/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# venv
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# 받아쓰기 산출물 / 캐시
+*.transcript.txt
+*.transcript.json
+*.transcript.srt
+*.transcript.vtt
+samples/
+out/
+*.wav
+*.mp3
+*.m4a
+*.mp4
+*.opus
+*.flac
+*.ogg
+
+# 모델 캐시 (혹시 로컬에 풀릴 경우)
+models/
+.cache/
