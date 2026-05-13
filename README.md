@@ -1,6 +1,8 @@
 # whisper-rabbit
 
-[elice](https://elice.io) 의 회의·스크럼을 자동으로 정리하기 위해 만든 사내용 도구. faster-whisper 기반 STT + Claude Code 슬래시 커맨드 `/회의녹음정리` 를 묶어, 음성 파일을 받아 **논의 내용 / 문제점 / 해결방안** 3섹션 회의록 docx로 자동 정리한다.
+[elice](https://elice.io) 의 회의·스크럼을 자동으로 정리하기 위해 만든 사내용 도구. faster-whisper 기반 STT + Claude Code 슬래시 커맨드 `/회의녹음정리` 를 묶어, 음성/영상 파일을 받아 **논의 내용 / 문제점 / 해결방안** 3섹션 회의록 docx 와 **한 화면 요약본**(`.summary.md`: TL;DR / 핵심 포인트 / 결정사항 / 액션 아이템 / 미해결 이슈)을 자동 생성한다.
+
+**지원 입력 포맷**: ffmpeg 가 디코드 가능한 모든 컨테이너 — `.mp3` / `.m4a` / `.wav` / `.mp4` / `.mov` / `.opus` / `.flac` 등. 영상 파일은 오디오 트랙만 자동 추출되므로 사전 변환 불필요.
 
 ## 주요 기능
 
@@ -64,7 +66,12 @@ python -m whisper_rabbit "C:\path\to\meeting.m4a" --model small --formats txt,sr
 /회의녹음정리 "C:\path\to\meeting.m4a" --model medium --team 팀2
 ```
 
-`/회의녹음정리`는 내부적으로 이 CLI를 호출하여 transcript를 만들고, 결과를 읽어 **논의 내용 / 문제점 / 해결방안** 3섹션 docx를 Desktop에 저장한다. 슬래시 커맨드 정의 본체는 [`claude/commands/회의녹음정리.md`](claude/commands/회의녹음정리.md).
+`/회의녹음정리`는 내부적으로 이 CLI를 호출하여 transcript 를 만들고, 결과를 읽어 두 산출물을 함께 Desktop 에 저장한다:
+
+- `<팀명>_회의녹음정리_<날짜>.docx` — **논의 내용 / 문제점 / 해결방안** 3섹션 정식 회의록
+- `<팀명>_회의녹음정리_<날짜>.summary.md` — TL;DR / 핵심 포인트 / 결정사항 / 액션 아이템 / 미해결 이슈로 구성된 한 화면 요약본 (GFM 체크박스 `- [ ]` 사용)
+
+슬래시 커맨드 정의 본체는 [`claude/commands/회의녹음정리.md`](claude/commands/회의녹음정리.md).
 
 ## 성능 팁
 
